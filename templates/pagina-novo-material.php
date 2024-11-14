@@ -20,7 +20,6 @@ wp_localize_script('jquery', 'gma_ajax', array(
                 <?php wp_nonce_field('gma_novo_material', 'gma_novo_material_nonce'); ?>
                 
                 <div class="gma-form-grid">
-                    <!-- Seleção de Campanha -->
                     <div class="gma-form-group">
                         <label for="campanha_id">
                             <i class="dashicons dashicons-megaphone"></i> Campanha
@@ -40,35 +39,30 @@ wp_localize_script('jquery', 'gma_ajax', array(
                             <?php endforeach; ?>
                         </select>
                     </div>
-                  
 
-                  <!-- Upload de Mídia -->
-<div class="gma-form-group">
-    <label for="gma-media-upload">
-        <i class="dashicons dashicons-format-image"></i> Mídia
-    </label>
-    <div class="gma-upload-container">
-        <input type="text" name="imagem_url" id="gma-imagem-url" 
-               class="gma-input" required readonly>
-        <input type="hidden" name="arquivo_id" id="gma-arquivo-id">
-        <button type="button" id="gma-upload-btn" class="gma-button secondary">
-            <i class="dashicons dashicons-upload"></i> Selecionar
-        </button>
-    </div>
-    
-    <!-- Seção de Preview -->
-    <div class="gma-preview-section" id="gma-preview-section" style="display: none;">
-        <h3 class="gma-preview-title">
-            <i class="dashicons dashicons-visibility"></i> Preview do Material
-        </h3>
-        <div class="gma-preview-container">
-            <div id="gma-media-preview" class="gma-media-preview-large"></div>
-        </div>
-    </div>
-</div>
-                  
-                  
-                    <!-- Tipo de Mídia -->
+                    <div class="gma-form-group">
+                        <label for="gma-media-upload">
+                            <i class="dashicons dashicons-format-image"></i> Mídia
+                        </label>
+                        <div class="gma-upload-container">
+                            <input type="text" name="imagem_url" id="gma-imagem-url" 
+                                   class="gma-input" required readonly>
+                            <input type="hidden" name="arquivo_id" id="gma-arquivo-id">
+                            <button type="button" id="gma-upload-btn" class="gma-button secondary">
+                                <i class="dashicons dashicons-upload"></i> Selecionar
+                            </button>
+                        </div>
+                        
+                        <div class="gma-preview-section" id="gma-preview-section" style="display: none;">
+                            <h3 class="gma-preview-title">
+                                <i class="dashicons dashicons-visibility"></i> Preview do Material
+                            </h3>
+                            <div class="gma-preview-container">
+                                <div id="gma-media-preview" class="gma-media-preview-large"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="gma-form-group">
                         <label for="tipo_midia">
                             <i class="dashicons dashicons-media-default"></i> Tipo de Mídia
@@ -79,7 +73,6 @@ wp_localize_script('jquery', 'gma_ajax', array(
                         </select>
                     </div>
 
-                    <!-- Copy do Material -->
                     <div class="gma-form-group full-width">
                         <label for="copy">
                             <i class="dashicons dashicons-editor-paste-text"></i> Copy
@@ -88,18 +81,16 @@ wp_localize_script('jquery', 'gma_ajax', array(
                         <div class="gma-character-count">
                             <span id="char-count">0</span> caracteres
                         </div>
-                        <div class="gma-form-group full-width">
-                            <button type="button" id="get-suggestions" class="gma-button secondary">
-                                <i class="dashicons dashicons-admin-customizer"></i> Obter Sugestões AI
-                            </button>
-                            <div id="suggestions-container" style="display: none;">
-                                <h3>Sugestões da IA</h3>
-                                <div id="suggestions-content"></div>
-                            </div>
+                        <button type="button" id="get-suggestions" class="gma-button secondary">
+                            <i class="dashicons dashicons-admin-customizer"></i> 
+                            <span class="button-text">Obter Sugestões AI</span>
+                        </button>
+                        <div id="suggestions-container" style="display: none;">
+                            <h3>Sugestões da IA</h3>
+                            <div id="suggestions-content"></div>
                         </div>
                     </div>
 
-                    <!-- Link do Canva -->
                     <div class="gma-form-group full-width" id="canva-group" style="display: none;">
                         <label for="link_canva">
                             <i class="dashicons dashicons-art"></i> Link do Canva
@@ -124,7 +115,6 @@ wp_localize_script('jquery', 'gma_ajax', array(
 </div>
 
 <style>
-/* Estilos CSS */
 :root {
     --primary-color: #4a90e2;
     --secondary-color: #2ecc71;
@@ -206,16 +196,32 @@ wp_localize_script('jquery', 'gma_ajax', array(
     gap: 10px;
 }
 
-.gma-media-preview {
-    margin-top: 10px;
-    max-width: 300px;
+.gma-preview-section {
+    margin-top: 20px;
+    background: var(--card-background);
+    border-radius: var(--border-radius);
+    padding: 20px;
+}
+
+.gma-preview-container {
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.gma-media-preview-large {
+    max-width: 100%;
     border-radius: var(--border-radius);
     overflow: hidden;
 }
 
-.gma-media-preview img,
-.gma-media-preview video {
-    width: 100%;
+.gma-media-preview-large img,
+.gma-media-preview-large video {
+    max-width: 100%;
     height: auto;
     display: block;
 }
@@ -255,11 +261,25 @@ wp_localize_script('jquery', 'gma_ajax', array(
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
+.gma-button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .gma-form-actions {
     display: flex;
     gap: 15px;
     margin-top: 30px;
     justify-content: flex-end;
+}
+
+#suggestions-container {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
 }
 
 @keyframes slideIn {
@@ -287,44 +307,6 @@ wp_localize_script('jquery', 'gma_ajax', array(
         justify-content: center;
     }
 }
-  
-  .gma-preview-section {
-    margin-top: 20px;
-    background: var(--card-background);
-    border-radius: var(--border-radius);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    padding: 20px;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.gma-preview-container {
-    background: var(--background-color);
-    border-radius: var(--border-radius);
-    padding: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 200px;
-}
-
-.gma-media-preview-large {
-    max-width: 100%;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.gma-media-preview-large img,
-.gma-media-preview-large video {
-    max-width: 100%;
-    height: auto;
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
 </style>
 
 <script>
@@ -339,22 +321,13 @@ jQuery(document).ready(function($) {
         
         if (tipoCampanha === 'marketing') {
             $('#canva-group').show();
-            $('#link_canva').prop('required', false);
         } else {
             $('#canva-group').hide();
-            $('#link_canva').prop('required', false);
+            $('#link_canva').val('');
         }
     });
-  $('#tipo_midia').on('change', function() {
-    custom_uploader = null;
-    // Limpa o preview quando mudar o tipo de mídia
-    $('#gma-media-preview').empty();
-    $('#gma-preview-section').hide();
-    $('#gma-imagem-url').val('');
-    $('#gma-arquivo-id').val('');
-});
 
-    // Upload de mídia (versão corrigida)
+    // Upload de mídia
     $('#gma-upload-btn').click(function(e) {
         e.preventDefault();
         
@@ -375,21 +348,20 @@ jQuery(document).ready(function($) {
         });
 
         custom_uploader.on('select', function() {
-    var attachment = custom_uploader.state().get('selection').first().toJSON();
-    $('#gma-imagem-url').val(attachment.url);
-    $('#gma-arquivo-id').val(attachment.id);
-    
-    // Preview atualizado com verificação de tipo
-    var previewHtml = '';
-    if (attachment.type.startsWith('image/')) {
-        previewHtml = `<img src="${attachment.url}" alt="Preview da Imagem" style="max-width: 100%; height: auto;">`;
-    } else if (attachment.type.startsWith('video/')) {
-        previewHtml = `<video src="${attachment.url}" controls style="max-width: 100%; height: auto;"></video>`;
-    }
-    
-    $('#gma-media-preview').html(previewHtml);
-    $('#gma-preview-section').fadeIn(300);
-});
+            var attachment = custom_uploader.state().get('selection').first().toJSON();
+            $('#gma-imagem-url').val(attachment.url);
+            $('#gma-arquivo-id').val(attachment.id);
+            
+            var previewHtml = '';
+            if (attachment.type === 'image') {
+                previewHtml = `<img src="${attachment.url}" alt="Preview da Imagem">`;
+            } else if (attachment.type === 'video') {
+                previewHtml = `<video src="${attachment.url}" controls></video>`;
+            }
+            
+            $('#gma-media-preview').html(previewHtml);
+            $('#gma-preview-section').fadeIn(300);
+        });
 
         custom_uploader.open();
     });
@@ -397,25 +369,30 @@ jQuery(document).ready(function($) {
     // Resetar o uploader quando mudar o tipo de mídia
     $('#tipo_midia').on('change', function() {
         custom_uploader = null;
+        $('#gma-media-preview').empty();
+        $('#gma-preview-section').hide();
+        $('#gma-imagem-url').val('');
+        $('#gma-arquivo-id').val('');
     });
 
     // Contador de caracteres
     $('#copy').on('input', function() {
-        var charCount = $(this).val().length;
-        $('#char-count').text(charCount);
+        $('#char-count').text($(this).val().length);
     });
 
     // Sugestões AI
     $('#get-suggestions').on('click', function() {
-        const copy = $('#copy').val();
         const button = $(this);
+        const buttonText = button.find('.button-text');
+        const copy = $('#copy').val();
         
         if (!copy) {
             alert('Por favor, insira algum texto primeiro.');
             return;
         }
         
-        button.prop('disabled', true).text('Obtendo sugestões...');
+        button.prop('disabled', true);
+        buttonText.html('Obtendo sugestões... <i class="dashicons dashicons-update gma-loading"></i>');
         
         $.ajax({
             url: gma_ajax.ajaxurl,
@@ -430,14 +407,15 @@ jQuery(document).ready(function($) {
                     $('#suggestions-content').html(response.data.suggestions);
                     $('#suggestions-container').slideDown();
                 } else {
-                    alert('Falha ao obter sugestões. Tente novamente.');
+                    alert('Erro: ' + (response.data?.message || 'Falha ao obter sugestões'));
                 }
             },
             error: function() {
-                alert('Erro ao conectar com o servidor.');
+                alert('Erro ao conectar com o servidor. Tente novamente.');
             },
             complete: function() {
-                button.prop('disabled', false).text('Obter Sugestões AI');
+                button.prop('disabled', false);
+                buttonText.html('<i class="dashicons dashicons-admin-customizer"></i> Obter Sugestões AI');
             }
         });
     });
@@ -449,7 +427,7 @@ jQuery(document).ready(function($) {
         $(this).find('[required]').each(function() {
             if (!$(this).val()) {
                 isValid = false;
-                $(this).addClass('error').shake();
+                $(this).addClass('error');
             } else {
                 $(this).removeClass('error');
             }
@@ -460,25 +438,5 @@ jQuery(document).ready(function($) {
             alert('Por favor, preencha todos os campos obrigatórios.');
         }
     });
-
-    // Efeito shake para campos com erro
-    $.fn.shake = function() {
-        this.each(function() {
-            $(this).css('position', 'relative');
-            for(var i = 0; i < 3; i++) {
-                $(this).animate({left: -10}, 50)
-                       .animate({left: 10}, 50)
-                       .animate({left: 0}, 50);
-            }
-        });
-    };
-});
-  $('#tipo_midia').on('change', function() {
-    custom_uploader = null;
-    // Limpa o preview quando mudar o tipo de mídia
-    $('#gma-media-preview').empty();
-    $('#gma-preview-section').hide();
-    $('#gma-imagem-url').val('');
-    $('#gma-arquivo-id').val('');
 });
 </script>
