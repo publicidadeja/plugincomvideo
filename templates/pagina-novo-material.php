@@ -13,7 +13,7 @@ wp_localize_script('jquery', 'gma_ajax', array(
 
 <div class="gma-create-wrap">
     <div class="gma-create-container">
-        <h1 class="gma-create-title"> Criar Novo Material</h1>
+        <h1 class="gma-create-title">Criar Novo Material</h1>
 
         <div class="gma-create-card">
             <form method="post" class="gma-create-form" id="gma-material-form">
@@ -40,6 +40,7 @@ wp_localize_script('jquery', 'gma_ajax', array(
                             <?php endforeach; ?>
                         </select>
                     </div>
+                  
 
                     <!-- Upload de Mídia -->
                     <div class="gma-form-group">
@@ -57,6 +58,8 @@ wp_localize_script('jquery', 'gma_ajax', array(
                         <div id="gma-media-preview" class="gma-media-preview"></div>
                     </div>
 
+                  
+                  
                     <!-- Tipo de Mídia -->
                     <div class="gma-form-group">
                         <label for="tipo_midia">
@@ -88,7 +91,7 @@ wp_localize_script('jquery', 'gma_ajax', array(
                         </div>
                     </div>
 
-                    <!-- Link do Canva (apenas para campanhas de marketing) -->
+                    <!-- Link do Canva -->
                     <div class="gma-form-group full-width" id="canva-group" style="display: none;">
                         <label for="link_canva">
                             <i class="dashicons dashicons-art"></i> Link do Canva
@@ -106,135 +109,14 @@ wp_localize_script('jquery', 'gma_ajax', array(
                        class="gma-button secondary">
                         <i class="dashicons dashicons-arrow-left-alt"></i> Voltar
                     </a>
-                  
                 </div>
-              
             </form>
         </div>
     </div>
 </div>
 
-<script>
-jQuery(document).ready(function($) {
-    // Controle de exibição dos campos baseado no tipo de campanha
-    $('#campanha_id').on('change', function() {
-        var selectedOption = $(this).find('option:selected');
-        var tipoCampanha = selectedOption.data('tipo');
-        
-        if (tipoCampanha === 'marketing') {
-            $('#canva-group').show();
-            $('#link_canva').prop('required', false);
-        } else {
-            $('#canva-group').hide();
-            $('#link_canva').prop('required', false);
-        }
-    });
-
-    // Upload de mídia
-    $('#gma-upload-btn').click(function(e) {
-        e.preventDefault();
-        
-        var custom_uploader = wp.media({
-            title: 'Selecionar Mídia',
-            button: {
-                text: 'Usar esta mídia'
-            },
-            multiple: false,
-            library: {
-                type: $('#tipo_midia').val() === 'imagem' ? 'image' : 'video'
-            }
-        });
-
-        custom_uploader.on('select', function() {
-            var attachment = custom_uploader.state().get('selection').first().toJSON();
-            $('#gma-imagem-url').val(attachment.url);
-            $('#gma-arquivo-id').val(attachment.id);
-            $('#gma-media-preview').html('<img src="' + attachment.url + '" alt="Preview">');
-        });
-
-        custom_uploader.open();
-    });
-
-    // Contador de caracteres
-    $('#copy').on('input', function() {
-        var charCount = $(this).val().length;
-        $('#char-count').text(charCount);
-    });
-
-    // Sugestões AI
-    $('#get-suggestions').on('click', function() {
-        const copy = $('#copy').val();
-        const button = $(this);
-        
-        if (!copy) {
-            alert('Por favor, insira algum texto primeiro.');
-            return;
-        }
-        
-        button.prop('disabled', true).text('Obtendo sugestões...');
-        
-        $.ajax({
-            url: ajaxurl,
-            type: 'POST',
-            data: {
-                action: 'gma_get_copy_suggestions',
-                nonce: '<?php echo wp_create_nonce("gma_copy_suggestions"); ?>',
-                copy: copy
-            },
-            success: function(response) {
-                if (response.success) {
-                    $('#suggestions-content').html(response.data.suggestions);
-                    $('#suggestions-container').slideDown();
-                } else {
-                    alert('Falha ao obter sugestões. Tente novamente.');
-                }
-            },
-            error: function() {
-                alert('Erro ao conectar com o servidor.');
-            },
-            complete: function() {
-                button.prop('disabled', false).text('Obter Sugestões AI');
-            }
-        });
-    });
-
-    // Validação do formulário
-    $('#gma-material-form').on('submit', function(e) {
-        var isValid = true;
-        
-        $(this).find('[required]').each(function() {
-            if (!$(this).val()) {
-                isValid = false;
-                $(this).addClass('error').shake();
-            } else {
-                $(this).removeClass('error');
-            }
-        });
-
-        if (!isValid) {
-            e.preventDefault();
-            alert('Por favor, preencha todos os campos obrigatórios.');
-        }
-    });
-
-    // Efeito shake para campos com erro
-    $.fn.shake = function() {
-        this.each(function() {
-            $(this).css('position', 'relative');
-            for(var i = 0; i < 3; i++) {
-                $(this).animate({left: -10}, 50)
-                       .animate({left: 10}, 50)
-                       .animate({left: 0}, 50);
-            }
-        });
-    };
-});
-  
-</script>
-
-
-
 <style>
+/* Estilos CSS */
 :root {
     --primary-color: #4a90e2;
     --secondary-color: #2ecc71;
@@ -397,28 +279,88 @@ jQuery(document).ready(function($) {
         justify-content: center;
     }
 }
-  .gma-media-preview {
-    margin-top: 10px;
-    max-width: 300px;
+  
+  .gma-preview-section {
+    margin-top: 40px;
+    background: var(--card-background);
     border-radius: var(--border-radius);
-    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 30px;
+    animation: slideIn 0.5s ease;
 }
 
-.gma-media-preview img,
-.gma-media-preview video {
+.gma-preview-title {
+    font-size: 1.5em;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.gma-preview-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+}
+
+.gma-media-preview-large {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.gma-media-preview-large img,
+.gma-media-preview-large video {
     width: 100%;
     height: auto;
     display: block;
+    border-radius: var(--border-radius);
+}
+
+@media (max-width: 768px) {
+    .gma-media-preview-large {
+        max-width: 100%;
+    }
 }
 </style>
 
 <script>
 jQuery(document).ready(function($) {
-    // Upload de mídia
+    // Variável global para o media uploader
+    var custom_uploader;
+
+    // Controle de exibição dos campos baseado no tipo de campanha
+    $('#campanha_id').on('change', function() {
+        var selectedOption = $(this).find('option:selected');
+        var tipoCampanha = selectedOption.data('tipo');
+        
+        if (tipoCampanha === 'marketing') {
+            $('#canva-group').show();
+            $('#link_canva').prop('required', false);
+        } else {
+            $('#canva-group').hide();
+            $('#link_canva').prop('required', false);
+        }
+    });
+
+    // Upload de mídia (versão corrigida)
     $('#gma-upload-btn').click(function(e) {
         e.preventDefault();
         
-        var custom_uploader = wp.media({
+        if (custom_uploader) {
+            custom_uploader.open();
+            return;
+        }
+        
+        custom_uploader = wp.media({
             title: 'Selecionar Mídia',
             button: {
                 text: 'Usar esta mídia'
@@ -434,7 +376,7 @@ jQuery(document).ready(function($) {
             $('#gma-imagem-url').val(attachment.url);
             $('#gma-arquivo-id').val(attachment.id);
             
-            // Verifica se é imagem ou vídeo para exibir o preview
+            // Preview baseado no tipo de mídia
             if (attachment.type.startsWith('image/')) {
                 $('#gma-media-preview').html('<img src="' + attachment.url + '" alt="Preview">');
             } else if (attachment.type.startsWith('video/')) {
@@ -443,6 +385,11 @@ jQuery(document).ready(function($) {
         });
 
         custom_uploader.open();
+    });
+
+    // Resetar o uploader quando mudar o tipo de mídia
+    $('#tipo_midia').on('change', function() {
+        custom_uploader = null;
     });
 
     // Contador de caracteres
@@ -464,11 +411,11 @@ jQuery(document).ready(function($) {
         button.prop('disabled', true).text('Obtendo sugestões...');
         
         $.ajax({
-            url: ajaxurl,
+            url: gma_ajax.ajaxurl,
             type: 'POST',
             data: {
                 action: 'gma_get_copy_suggestions',
-                nonce: '<?php echo wp_create_nonce("gma_copy_suggestions"); ?>',
+                nonce: gma_ajax.nonce,
                 copy: copy
             },
             success: function(response) {
