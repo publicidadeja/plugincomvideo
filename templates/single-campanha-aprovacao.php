@@ -13,7 +13,7 @@ wp_enqueue_script('sweetalert2', 'https://cdn.jsdelivr.net/npm/sweetalert2@11', 
 wp_enqueue_script('gma-script', plugin_dir_url(__FILE__) . '../assets/js/gma-script.js', array('jquery', 'swiper', 'gsap', 'sweetalert2'), '1.0.0', true);
 wp_enqueue_style('roboto-font', 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 wp_enqueue_style('swiper-css', 'https://unpkg.com/swiper/swiper-bundle.min.css');
-
+wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
 
 get_header();
 
@@ -50,10 +50,19 @@ if ($campanha) :
                             <div class="gma-material-content">
                                 <p class="gma-copy"><?php echo wp_kses_post($material->copy ?? ''); ?></p>
                                 <div class="gma-acoes">
-                                    <button class="gma-aprovar" data-action="aprovar" <?php echo $material->status_aprovacao === 'aprovado' ? 'disabled' : ''; ?>>Aprovar</button>
-                                    <button class="gma-reprovar" data-action="reprovar" <?php echo $material->status_aprovacao === 'reprovado' ? 'disabled' : ''; ?>>Reprovar</button>
-                                    <button class="gma-editar" data-action="editar">Editar</button>
-                                </div>
+    <button class="gma-aprovar" data-action="aprovar" <?php echo $material->status_aprovacao === 'aprovado' ? 'disabled' : ''; ?>>
+        <i class="fas fa-check"></i>
+        <span>Aprovar</span>
+    </button>
+    <button class="gma-reprovar" data-action="reprovar" <?php echo $material->status_aprovacao === 'reprovado' ? 'disabled' : ''; ?>>
+        <i class="fas fa-times"></i>
+        <span>Reprovar</span>
+    </button>
+    <button class="gma-editar" data-action="editar">
+        <i class="fas fa-edit"></i>
+        <span>Editar</span>
+    </button>
+</div>
                                 <div class="gma-edicao">
                                     <h3>Editar Material</h3>
                                     <textarea class="gma-alteracao-arte" rows="4" placeholder="Descreva as alterações necessárias"></textarea>
@@ -577,6 +586,66 @@ if ($campanha) :
 video.gma-material-image {
     object-fit: contain; /* Adjust as needed for video */
 }
+  /* Estilos para os botões de ação em mobile */
+@media (max-width: 768px) {
+    .gma-acoes {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 15px;
+        display: flex;
+        justify-content: space-around;
+        backdrop-filter: blur(10px);
+        z-index: 100;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+
+    .gma-acoes button {
+        min-width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .gma-acoes button i {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .gma-acoes button span {
+        font-size: 12px;
+    }
+
+    /* Cores específicas para cada botão */
+    .gma-aprovar {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .gma-reprovar {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .gma-editar {
+        background-color: #2196F3;
+        color: white;
+    }
+
+    /* Ajuste do conteúdo principal para não ficar escondido pelos botões fixos */
+    .gma-material {
+        padding-bottom: 100px;
+    }
+}
 </style>
 
 <script>
@@ -662,6 +731,167 @@ video.gma-material-image {
             });
         });
     });
+  
+  function confirmarAcao(button, acao) {
+        const $button = $(button);
+        const $material = $button.closest('.gma-material');
+        const materialId = $material.data('material-id');
+        
+        let titulo, texto, icone;
+        
+        switch(acao) {
+            case 'aprovar':
+                titulo = 'Confirmar Aprovação';
+                texto = 'Deseja realmente aprovar este material?';
+                icone = 'success';
+                break;
+            case 'reprovar':
+                titulo = 'Confirmar Reprovação';
+                texto = 'Deseja realmente reprovar este material?';
+                icone = 'warning';
+                break;
+            case 'editar':
+                titulo = 'Confirmar Edição';
+                texto = 'Deseja editar este material?';
+                icone = 'info';
+                break;
+        }
+
+        Swal.fire({
+            title: titulo,
+            text: texto,
+            icon: icone,
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sim',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (acao === 'editar') {
+                    const $edicao = $material.find('.gma-edicao');
+                    $edicao.slideDown(300);
+                } else {
+                    executarAcao($material, materialId, acao);
+                }
+            }
+        });
+    }
+
+    // Função para executar a ação após confirmação
+    function executarAcao($material, materialId, acao) {
+        $.ajax({
+            url: gmaAjax.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'gma_' + acao + '_material',
+                material_id: materialId,
+                nonce: gmaAjax.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso!',
+                        text: 'Material ' + (acao === 'aprovar' ? 'aprovado' : 'reprovado') + ' com sucesso!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                    $material.removeClass('status-aprovado status-reprovado status-pendente')
+                            .addClass('status-' + acao);
+                    $material.find('.gma-status')
+                            .text(acao.charAt(0).toUpperCase() + acao.slice(1));
+                    
+                    $material.find('.gma-' + acao).prop('disabled', true)
+                            .siblings().prop('disabled', false);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro!',
+                        text: response.data.message
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: 'Erro ao processar a solicitação. Tente novamente.'
+                });
+            }
+        });
+    }
+
+    // Event listeners para os botões
+    $(document).on('click', '.gma-aprovar', function(e) {
+        e.preventDefault();
+        confirmarAcao(this, 'aprovar');
+    });
+
+    $(document).on('click', '.gma-reprovar', function(e) {
+        e.preventDefault();
+        confirmarAcao(this, 'reprovar');
+    });
+
+    $(document).on('click', '.gma-editar', function(e) {
+        e.preventDefault();
+        confirmarAcao(this, 'editar');
+    });
+
+    // Confirmação para salvar edições
+    $(document).on('click', '.gma-salvar-edicao', function(e) {
+        e.preventDefault();
+        const $material = $(this).closest('.gma-material');
+        const materialId = $material.data('material-id');
+        const alteracaoArte = $material.find('.gma-alteracao-arte').val();
+        const novaCopy = $material.find('.gma-copy-edit').val();
+
+        Swal.fire({
+            title: 'Confirmar Alterações',
+            text: 'Deseja salvar as alterações realizadas?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Salvar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: gmaAjax.ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'gma_editar_material',
+                        material_id: materialId,
+                        alteracao_arte: alteracaoArte,
+                        nova_copy: novaCopy,
+                        nonce: gmaAjax.nonce
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sucesso!',
+                                text: 'Alterações salvas com sucesso!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            $material.find('.gma-edicao').slideUp(300);
+                            $material.find('.gma-copy').text(novaCopy);
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro!',
+                                text: response.data.message
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    });
+});
 </script>
 
 <?php
