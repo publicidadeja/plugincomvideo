@@ -382,43 +382,43 @@ jQuery(document).ready(function($) {
 
     // Sugestões AI
     $('#get-suggestions').on('click', function() {
-        const button = $(this);
-        const buttonText = button.find('.button-text');
-        const copy = $('#copy').val();
-        
-        if (!copy) {
-            alert('Por favor, insira algum texto primeiro.');
-            return;
-        }
-        
-        button.prop('disabled', true);
-        buttonText.html('Obtendo sugestões... <i class="dashicons dashicons-update gma-loading"></i>');
-        
-        $.ajax({
-            url: gma_ajax.ajaxurl,
-            type: 'POST',
-            data: {
-                action: 'gma_get_copy_suggestions',
-                nonce: gma_ajax.nonce,
-                copy: copy
-            },
-            success: function(response) {
-                if (response.success) {
-                    $('#suggestions-content').html(response.data.suggestions);
-                    $('#suggestions-container').slideDown();
-                } else {
-                    alert('Erro: ' + (response.data?.message || 'Falha ao obter sugestões'));
-                }
-            },
-            error: function() {
-                alert('Erro ao conectar com o servidor. Tente novamente.');
-            },
-            complete: function() {
-                button.prop('disabled', false);
-                buttonText.html('<i class="dashicons dashicons-admin-customizer"></i> Obter Sugestões AI');
+    const button = $(this);
+    const buttonText = button.find('.button-text');
+    const copy = $('#copy').val();
+    
+    if (!copy) {
+        alert('Por favor, insira algum texto primeiro.');
+        return;
+    }
+    
+    button.prop('disabled', true);
+    buttonText.html('Obtendo sugestões... <i class="dashicons dashicons-update gma-loading"></i>');
+    
+    $.ajax({
+        url: ajaxurl,  // Mudança aqui
+        type: 'POST',
+        data: {
+            action: 'gma_get_copy_suggestions',
+            nonce: '<?php echo wp_create_nonce("gma_copy_suggestions"); ?>', // Mudança aqui
+            copy: copy
+        },
+        success: function(response) {
+            if (response.success) {
+                $('#suggestions-content').html(response.data.suggestions);
+                $('#suggestions-container').slideDown();
+            } else {
+                alert('Erro: ' + (response.data?.message || 'Falha ao obter sugestões'));
             }
-        });
+        },
+        error: function() {
+            alert('Erro ao conectar com o servidor. Tente novamente.');
+        },
+        complete: function() {
+            button.prop('disabled', false);
+            buttonText.html('<i class="dashicons dashicons-admin-customizer"></i> Obter Sugestões AI');
+        }
     });
+});
 
     // Validação do formulário
     $('#gma-material-form').on('submit', function(e) {
@@ -440,3 +440,4 @@ jQuery(document).ready(function($) {
     });
 });
 </script>
+
