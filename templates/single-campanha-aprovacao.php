@@ -396,22 +396,76 @@ if ($campanha) :
 .gma-reprovar { background-color: #e74c3c; color: white; }
 .gma-editar { background-color: #3498db; color: white; }
 
+/* Adicione/modifique estes estilos na seção .gma-edicao */
 .gma-edicao {
     display: none;
-    padding: 15px;
+    padding: 20px;
     background: #f8f9fa;
     border-radius: 8px;
     margin-top: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.gma-edicao h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #333;
 }
 
 .gma-edicao textarea {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
+    min-height: 120px; /* Altura mínima aumentada */
+    padding: 12px;
+    margin-bottom: 15px;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical; /* Permite redimensionar verticalmente */
 }
 
+.gma-edicao button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    min-width: 120px;
+}
+
+.gma-salvar-edicao {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.gma-cancelar-edicao {
+    background-color: #95a5a6;
+    color: white;
+}
+
+/* Ajustes para mobile */
+@media (max-width: 768px) {
+    .gma-edicao {
+        padding: 15px;
+        margin: 10px -15px;
+        border-radius: 0;
+    }
+
+    .gma-edicao textarea {
+        min-height: 150px; /* Altura ainda maior no mobile */
+        font-size: 16px; /* Fonte maior para melhor legibilidade */
+        padding: 15px;
+    }
+
+    .gma-edicao button {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+        padding: 15px;
+    }
+}
 /* Estilos específicos para mobile */
 @media (max-width: 768px) {
     .swiper-container {
@@ -450,6 +504,7 @@ if ($campanha) :
 }
 
 /* Ajustes do Lightbox */
+/* Substitua os estilos do lightbox existentes por estes */
 .lightbox {
     display: none;
     position: fixed;
@@ -458,26 +513,43 @@ if ($campanha) :
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.9);
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .lightbox-content {
-    max-width: 90%;
+    max-width: 100%;
     max-height: 90vh;
-    margin: auto;
-    display: block;
+    width: auto;
+    height: auto;
     position: relative;
     top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: contain; /* Mantém a proporção da imagem */
 }
 
 .close-lightbox {
-    position: absolute;
-    right: 20px;
-    top: 20px;
+    position: fixed;
+    top: 15px;
+    right: 25px;
     color: #fff;
     font-size: 30px;
+    font-weight: bold;
     cursor: pointer;
+    z-index: 1001;
+}
+
+/* Adicione estes estilos para melhor responsividade */
+@media (max-width: 768px) {
+    .lightbox {
+        padding: 10px;
+    }
+    
+    .lightbox-content {
+        max-height: 80vh;
+    }
 }
 
 /* Estilos para as setas do Swiper */
@@ -510,18 +582,7 @@ video.gma-material-image {
 <script>
     //Existing Javascript from both snippets combined
     document.addEventListener('DOMContentLoaded', function() {
-        const swiper = new Swiper('.swiper-container', {
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
-            spaceBetween: 10,
-            loop: false,
-        });
+        
 
         // Lightbox functionality
         const lightbox = document.getElementById('imageLightbox');
@@ -607,3 +668,4 @@ video.gma-material-image {
 endif;
 get_footer();
 ?>
+
