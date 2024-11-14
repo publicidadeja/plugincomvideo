@@ -50,19 +50,19 @@ if ($campanha) :
                             <div class="gma-material-content">
                                 <p class="gma-copy"><?php echo wp_kses_post($material->copy ?? ''); ?></p>
                                 <div class="gma-acoes">
-    <button class="gma-aprovar" data-action="aprovar" <?php echo $material->status_aprovacao === 'aprovado' ? 'disabled' : ''; ?>>
-        <i class="fas fa-check"></i>
-        <span>Aprovar</span>
-    </button>
-    <button class="gma-reprovar" data-action="reprovar" <?php echo $material->status_aprovacao === 'reprovado' ? 'disabled' : ''; ?>>
-        <i class="fas fa-times"></i>
-        <span>Reprovar</span>
-    </button>
-    <button class="gma-editar" data-action="editar">
-        <i class="fas fa-edit"></i>
-        <span>Editar</span>
-    </button>
-</div>
+                                    <button class="gma-aprovar" data-action="aprovar" <?php echo $material->status_aprovacao === 'aprovado' ? 'disabled' : ''; ?>>
+                                        <i class="fas fa-check"></i>
+                                        <span>Aprovar</span>
+                                    </button>
+                                    <button class="gma-reprovar" data-action="reprovar" <?php echo $material->status_aprovacao === 'reprovado' ? 'disabled' : ''; ?>>
+                                        <i class="fas fa-times"></i>
+                                        <span>Reprovar</span>
+                                    </button>
+                                    <button class="gma-editar" data-action="editar">
+                                        <i class="fas fa-edit"></i>
+                                        <span>Editar</span>
+                                    </button>
+                                </div>
                                 <div class="gma-edicao">
                                     <h3>Editar Material</h3>
                                     <textarea class="gma-alteracao-arte" rows="4" placeholder="Descreva as alterações necessárias"></textarea>
@@ -898,4 +898,3 @@ video.gma-material-image {
 endif;
 get_footer();
 ?>
-
