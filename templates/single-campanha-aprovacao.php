@@ -90,6 +90,8 @@ if ($campanha) :
     <img class="lightbox-content" id="lightboxImage" src="" alt="Lightbox Image">
 </div>
 
+
+
 <style>
 /* Variáveis CSS */
 :root {
@@ -513,7 +515,6 @@ if ($campanha) :
 }
 
 /* Ajustes do Lightbox */
-/* Substitua os estilos do lightbox existentes por estes */
 .lightbox {
     display: none;
     position: fixed;
@@ -536,7 +537,7 @@ if ($campanha) :
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    object-fit: contain; /* Mantém a proporção da imagem */
+    object-fit: contain;
 }
 
 .close-lightbox {
@@ -550,7 +551,47 @@ if ($campanha) :
     z-index: 1001;
 }
 
-/* Adicione estes estilos para melhor responsividade */
+/* Estilos específicos para vídeos */
+.gma-material-image-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+/* Estilo para o botão de play personalizado */
+.video-play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.video-play-button:before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 0 10px 20px;
+    border-color: transparent transparent transparent #ffffff;
+    margin-left: 5px;
+}
+
+/* Classe específica para imagens que podem abrir no lightbox */
+img.lightbox-trigger {
+    cursor: pointer;
+}
+
+/* Responsividade */
 @media (max-width: 768px) {
     .lightbox {
         padding: 10px;
@@ -559,8 +600,29 @@ if ($campanha) :
     .lightbox-content {
         max-height: 80vh;
     }
+    
+    .close-lightbox {
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+    }
+    
+    .video-play-button {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .video-play-button:before {
+        border-width: 8px 0 8px 16px;
+    }
 }
 
+/* Estilo para vídeos em tela cheia */
+.video-fullscreen {
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+}
 /* Estilos para as setas do Swiper */
 .swiper-button-next,
 .swiper-button-prev {
@@ -654,19 +716,39 @@ video.gma-material-image {
         
 
         // Lightbox functionality
-        const lightbox = document.getElementById('imageLightbox');
-        const lightboxImage = document.getElementById('lightboxImage');
-        const lightboxTriggers = document.querySelectorAll('.lightbox-trigger');
+const lightbox = document.getElementById('imageLightbox');
+const lightboxImage = document.getElementById('lightboxImage');
+const lightboxTriggers = document.querySelectorAll('.lightbox-trigger');
 
-        lightboxTriggers.forEach(trigger => {
-            if (trigger.tagName === 'IMG') { // Only for images
-                trigger.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    lightboxImage.src = trigger.src;
-                    lightbox.style.display = 'block';
-                });
-            }
+lightboxTriggers.forEach(trigger => {
+    // Only add click event for elements with both 'lightbox-trigger' class and 'img' tag
+    if (trigger.tagName.toLowerCase() === 'img') {
+        trigger.addEventListener('click', (event) => {
+            event.preventDefault();
+            lightboxImage.src = trigger.src;
+            lightbox.style.display = 'block';
         });
+    }
+});
+
+// Close lightbox when clicking the close button
+document.querySelector('.close-lightbox').addEventListener('click', () => {
+    lightbox.style.display = 'none';
+});
+
+// Close lightbox when clicking outside the image
+lightbox.addEventListener('click', (event) => {
+    if (event.target === lightbox) {
+        lightbox.style.display = 'none';
+    }
+});
+
+// Close lightbox with ESC key
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && lightbox.style.display === 'block') {
+        lightbox.style.display = 'none';
+    }
+});
 
         document.querySelector('.close-lightbox').addEventListener('click', () => {
             lightbox.style.display = 'none';
@@ -892,9 +974,102 @@ video.gma-material-image {
         });
     });
 });
+  document.addEventListener('DOMContentLoaded', function() {
+    // Função para lidar com cliques em vídeos
+    const videos = document.querySelectorAll('.gma-material-image-container video');
+    
+    videos.forEach(video => {
+        // Criar botão de play personalizado
+        const playButton = document.createElement('div');
+        playButton.className = 'video-play-button';
+        video.parentElement.appendChild(playButton);
+        
+        // Mostrar/ocultar botão de play
+        video.addEventListener('play', () => {
+            playButton.style.display = 'none';
+        });
+        
+        video.addEventListener('pause', () => {
+            playButton.style.display = 'flex';
+        });
+        
+        // Lidar com clique no botão de play
+        playButton.addEventListener('click', () => {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        });
+        
+        // Lidar com clique no vídeo
+        video.addEventListener('click', () => {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        });
+        
+        // Habilitar controles nativos em tela cheia
+        video.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                video.controls = true;
+                video.classList.add('video-fullscreen');
+            } else {
+                video.controls = false;
+                video.classList.remove('video-fullscreen');
+            }
+        });
+        
+        // Duplo clique para tela cheia
+        video.addEventListener('dblclick', () => {
+            if (!document.fullscreenElement) {
+                video.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+    });
+
+    // Lightbox apenas para imagens
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxTriggers = document.querySelectorAll('.lightbox-trigger');
+
+    lightboxTriggers.forEach(trigger => {
+        if (trigger.tagName.toLowerCase() === 'img') {
+            trigger.addEventListener('click', (event) => {
+                event.preventDefault();
+                lightboxImage.src = trigger.src;
+                lightbox.style.display = 'block';
+            });
+        }
+    });
+
+    // Fechar lightbox
+    document.querySelector('.close-lightbox').addEventListener('click', () => {
+        lightbox.style.display = 'none';
+    });
+
+    // Fechar lightbox clicando fora
+    lightbox.addEventListener('click', (event) => {
+        if (event.target === lightbox) {
+            lightbox.style.display = 'none';
+        }
+    });
+
+    // Fechar com ESC
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && lightbox.style.display === 'block') {
+            lightbox.style.display = 'none';
+        }
+    });
+});
 </script>
 
 <?php
 endif;
 get_footer();
 ?>
+
