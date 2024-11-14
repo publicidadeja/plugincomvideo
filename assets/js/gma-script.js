@@ -92,12 +92,15 @@
         // Atribuir a função aos eventos 'click' e 'touchstart' usando delegação
         $(document).on('click touchstart', '.gma-aprovar, .gma-reprovar', handleButtonClick);
 
-        $(document).on('click touchstart', '.gma-editar', function() {
-            var $material = $(this).closest('.gma-material');
-            var $edicao = $material.find('.gma-edicao');
-            
-            $edicao.slideToggle(300);
-        });
+        $(document).on('click touchstart', '.gma-editar', function(e) {
+    e.preventDefault(); // Previne propagação do evento
+    e.stopPropagation(); // Para a propagação do evento
+    
+    var $material = $(this).closest('.gma-material');
+    var $edicao = $material.find('.gma-edicao');
+    
+    $edicao.slideDown(300); // Força abertura ao invés de toggle
+});
 
         $(document).on('click touchstart', '.gma-cancelar-edicao', function() {
             var $material = $(this).closest('.gma-material');
@@ -190,3 +193,53 @@
         });
     });
 })(jQuery);
+// Adicione este código no gma-script.js
+
+$(document).ready(function() {
+    let isDragging = false;
+    let startX, startY;
+    
+    // Detectar início do toque/arraste
+    $('.lightbox-trigger').on('mousedown touchstart', function(e) {
+        isDragging = false;
+        if (e.type === 'touchstart') {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        } else {
+            startX = e.clientX;
+            startY = e.clientY;
+        }
+    });
+
+    // Detectar movimento
+    $('.lightbox-trigger').on('mousemove touchmove', function(e) {
+        if (e.type === 'touchmove') {
+            let moveX = Math.abs(e.touches[0].clientX - startX);
+            let moveY = Math.abs(e.touches[0].clientY - startY);
+            if (moveX > 10 || moveY > 10) {
+                isDragging = true;
+            }
+        } else {
+            isDragging = true;
+        }
+    });
+
+    // Abrir lightbox apenas se não estiver arrastando
+    $('.lightbox-trigger').on('mouseup touchend', function(e) {
+        if (!isDragging) {
+            // Seu código para abrir o lightbox aqui
+            const imageUrl = $(this).attr('src');
+            Swal.fire({
+                imageUrl: imageUrl,
+                imageAlt: 'Material',
+                width: '80%',
+                showConfirmButton: false,
+                background: 'rgba(0,0,0,0.9)',
+                customClass: {
+                    container: 'gma-lightbox'
+                }
+            });
+        }
+        isDragging = false;
+    });
+});
