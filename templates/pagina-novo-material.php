@@ -42,22 +42,30 @@ wp_localize_script('jquery', 'gma_ajax', array(
                     </div>
                   
 
-                    <!-- Upload de Mídia -->
-                    <div class="gma-form-group">
-                        <label for="gma-media-upload">
-                            <i class="dashicons dashicons-format-image"></i> Mídia
-                        </label>
-                        <div class="gma-upload-container">
-                            <input type="text" name="imagem_url" id="gma-imagem-url" 
-                                   class="gma-input" required readonly>
-                            <input type="hidden" name="arquivo_id" id="gma-arquivo-id">
-                            <button type="button" id="gma-upload-btn" class="gma-button secondary">
-                                <i class="dashicons dashicons-upload"></i> Selecionar
-                            </button>
-                        </div>
-                        <div id="gma-media-preview" class="gma-media-preview"></div>
-                    </div>
-
+                  <!-- Upload de Mídia -->
+<div class="gma-form-group">
+    <label for="gma-media-upload">
+        <i class="dashicons dashicons-format-image"></i> Mídia
+    </label>
+    <div class="gma-upload-container">
+        <input type="text" name="imagem_url" id="gma-imagem-url" 
+               class="gma-input" required readonly>
+        <input type="hidden" name="arquivo_id" id="gma-arquivo-id">
+        <button type="button" id="gma-upload-btn" class="gma-button secondary">
+            <i class="dashicons dashicons-upload"></i> Selecionar
+        </button>
+    </div>
+    
+    <!-- Seção de Preview -->
+    <div class="gma-preview-section" id="gma-preview-section" style="display: none;">
+        <h3 class="gma-preview-title">
+            <i class="dashicons dashicons-visibility"></i> Preview do Material
+        </h3>
+        <div class="gma-preview-container">
+            <div id="gma-media-preview" class="gma-media-preview-large"></div>
+        </div>
+    </div>
+</div>
                   
                   
                     <!-- Tipo de Mídia -->
@@ -281,54 +289,41 @@ wp_localize_script('jquery', 'gma_ajax', array(
 }
   
   .gma-preview-section {
-    margin-top: 40px;
+    margin-top: 20px;
     background: var(--card-background);
     border-radius: var(--border-radius);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    padding: 30px;
-    animation: slideIn 0.5s ease;
-}
-
-.gma-preview-title {
-    font-size: 1.5em;
-    color: var(--text-color);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
 .gma-preview-container {
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 200px;
-    background: var(--background-color);
-    border-radius: var(--border-radius);
-    padding: 20px;
 }
 
 .gma-media-preview-large {
-    max-width: 600px;
-    width: 100%;
-    margin: 0 auto;
+    max-width: 100%;
     border-radius: var(--border-radius);
     overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .gma-media-preview-large img,
 .gma-media-preview-large video {
-    width: 100%;
+    max-width: 100%;
     height: auto;
     display: block;
-    border-radius: var(--border-radius);
 }
 
-@media (max-width: 768px) {
-    .gma-media-preview-large {
-        max-width: 100%;
-    }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>
 
@@ -350,6 +345,14 @@ jQuery(document).ready(function($) {
             $('#link_canva').prop('required', false);
         }
     });
+  $('#tipo_midia').on('change', function() {
+    custom_uploader = null;
+    // Limpa o preview quando mudar o tipo de mídia
+    $('#gma-media-preview').empty();
+    $('#gma-preview-section').hide();
+    $('#gma-imagem-url').val('');
+    $('#gma-arquivo-id').val('');
+});
 
     // Upload de mídia (versão corrigida)
     $('#gma-upload-btn').click(function(e) {
@@ -372,17 +375,21 @@ jQuery(document).ready(function($) {
         });
 
         custom_uploader.on('select', function() {
-            var attachment = custom_uploader.state().get('selection').first().toJSON();
-            $('#gma-imagem-url').val(attachment.url);
-            $('#gma-arquivo-id').val(attachment.id);
-            
-            // Preview baseado no tipo de mídia
-            if (attachment.type.startsWith('image/')) {
-                $('#gma-media-preview').html('<img src="' + attachment.url + '" alt="Preview">');
-            } else if (attachment.type.startsWith('video/')) {
-                $('#gma-media-preview').html('<video src="' + attachment.url + '" controls></video>');
-            }
-        });
+    var attachment = custom_uploader.state().get('selection').first().toJSON();
+    $('#gma-imagem-url').val(attachment.url);
+    $('#gma-arquivo-id').val(attachment.id);
+    
+    // Preview atualizado com verificação de tipo
+    var previewHtml = '';
+    if (attachment.type.startsWith('image/')) {
+        previewHtml = `<img src="${attachment.url}" alt="Preview da Imagem" style="max-width: 100%; height: auto;">`;
+    } else if (attachment.type.startsWith('video/')) {
+        previewHtml = `<video src="${attachment.url}" controls style="max-width: 100%; height: auto;"></video>`;
+    }
+    
+    $('#gma-media-preview').html(previewHtml);
+    $('#gma-preview-section').fadeIn(300);
+});
 
         custom_uploader.open();
     });
@@ -465,5 +472,13 @@ jQuery(document).ready(function($) {
             }
         });
     };
+});
+  $('#tipo_midia').on('change', function() {
+    custom_uploader = null;
+    // Limpa o preview quando mudar o tipo de mídia
+    $('#gma-media-preview').empty();
+    $('#gma-preview-section').hide();
+    $('#gma-imagem-url').val('');
+    $('#gma-arquivo-id').val('');
 });
 </script>
