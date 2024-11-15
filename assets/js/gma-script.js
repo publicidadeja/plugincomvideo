@@ -166,12 +166,15 @@
         });
 
         // Abrir o lightbox ao clicar na imagem
-        $(document).on('click touchstart', '.lightbox-trigger', function(e) {
-            e.preventDefault();
-            var imageUrl = $(this).attr('src');
-            $('#lightboxImage').attr('src', imageUrl);
-            $('#imageLightbox').fadeIn('fast');
-        });
+        // Modifique o event listener do lightbox
+$(document).on('click touchstart', '.lightbox-trigger', function(e) {
+    if (!$(this).is('img')) return; // Só continua se for uma imagem
+    e.preventDefault();
+    e.stopPropagation();
+    var imageUrl = $(this).attr('src');
+    $('#lightboxImage').attr('src', imageUrl);
+    $('#imageLightbox').fadeIn('fast');
+});
 
         // Fechar o lightbox ao clicar no botão de fechar ou fora da imagem
         $(document).on('click', '.close-lightbox, .lightbox', function() {
@@ -243,3 +246,4 @@ $(document).ready(function() {
         isDragging = false;
     });
 });
+
