@@ -39,13 +39,13 @@ if ($campanha) :
                                 $video_extensions = ['mp4', 'webm', 'ogg', 'mov']; // Added more video extensions
 
                                 if (in_array($file_extension, $video_extensions)) : ?>
-                                    <video class="gma-material-image" controls preload="metadata" poster="<?php echo esc_url($material->imagem_url); ?>">
-                                        <source src="<?php echo esc_url($material->imagem_url); ?>" type="video/<?php echo $file_extension; ?>">
-                                        Seu navegador não suporta o elemento de vídeo.
-                                    </video>
-                                <?php else : ?>
-                                    <img class="gma-material-image lightbox-trigger" src="<?php echo esc_url($material->imagem_url); ?>" alt="Material">
-                                <?php endif; ?>
+    <video class="gma-material-video" controls preload="metadata">
+        <source src="<?php echo esc_url($material->imagem_url); ?>" type="video/<?php echo $file_extension; ?>">
+        Seu navegador não suporta o elemento de vídeo.
+    </video>
+<?php else : ?>
+    <img class="gma-material-image lightbox-trigger" src="<?php echo esc_url($material->imagem_url); ?>" alt="Material">
+<?php endif; ?>
                             </div>
                             <div class="gma-material-content">
                                 <p class="gma-copy"><?php echo wp_kses_post($material->copy ?? ''); ?></p>
@@ -707,6 +707,20 @@ video.gma-material-image {
     .gma-material {
         padding-bottom: 100px;
     }
+}
+  
+  .gma-material-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    cursor: default;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.gma-material-video:hover {
+    cursor: default;
 }
 </style>
 
