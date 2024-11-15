@@ -93,14 +93,7 @@
             }
         });
 
-        // Abrir o lightbox ao clicar na imagem
-        $('.gma-material-image').on('click', function(e) {
-            e.preventDefault();
-            var imageUrl = $(this).attr('src');
-            $('#lightboxImage').attr('src', imageUrl);
-            $('#imageLightbox').fadeIn('fast');
-        });
-
+        
         // Fechar o lightbox ao clicar no botão de fechar ou fora da imagem
         $('.close-lightbox, .lightbox').click(function() {
             $('#imageLightbox').fadeOut('fast');
