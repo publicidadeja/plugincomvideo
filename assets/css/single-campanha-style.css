@@ -339,3 +339,15 @@ get_footer();
     text-decoration: none;
     cursor: pointer;
 }
+
+/* Em /assets/css/single-campanha-style.css */
+
+video.video-player {
+    width: 100%;
+    height: auto;
+    cursor: default;
+}
+
+video.video-player:hover {
+    cursor: default;
+}
